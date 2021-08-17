@@ -29,16 +29,6 @@ class Password1(Password):
     def is_valid(self):
         return self.min <= self.pw.count(self.letter) <= self.max
 
-    def read_input(input: str) -> List[Password]: #TODO use a decorator for the read input function
-        res = []
-        passwords = input.split('\n')
-        for password in passwords:
-            pw = password.split()
-            min = int(pw[0].split('-')[0])
-            max = int(pw[0].split('-')[1])
-            password = Password1(pw[2], min, max, pw[1][0]) 
-            res.append(password)
-        return res
 
 class Password2(Password):
     def __init__(self, pw: str, ind1: int, ind2: int, letter: str) -> None:
@@ -51,19 +41,32 @@ class Password2(Password):
         v1 = (self.pw[self.ind1] == self.letter)
         v2 = (self.pw[self.ind2] == self.letter)
         return (v1 or v2) and not(v1 and v2)
-    
-    def read_input(input: str) -> List[Password]:
+
+
+def decorate_read_input(function):
+    """Cette fonction va générer le décorateur."""
+ 
+    def wrapper(input: str)-> List[Password]:
+        """Voici le "vrai" décorateur.
+ 
+        C'est ici que l'on change la fonction de base
+        en rajoutant des choses avant et après.
+        """
         res = []
         passwords = input.split('\n')
         for password in passwords:
             pw = password.split()
-            ind1 = int(pw[0].split('-')[0])
-            ind2 = int(pw[0].split('-')[1])
-            password = Password2(pw[2], ind1, ind2, pw[1][0]) 
+            min = int(pw[0].split('-')[0])
+            max = int(pw[0].split('-')[1])
+            password = function(pw[2], min, max, pw[1][0]) 
             res.append(password)
         return res
-
-
+ 
+    return wrapper
+ 
+ 
+read_input1 = decorate_read_input(Password1)
+read_input2 = decorate_read_input(Password2)
 
 def count_valid_password(input: List[Password]) -> bool:
     count = 0
@@ -72,8 +75,8 @@ def count_valid_password(input: List[Password]) -> bool:
             count +=1
     return count
 
-assert count_valid_password(Password1.read_input(TEST_INPUT)) == 2
-assert count_valid_password(Password2.read_input(TEST_INPUT)) == 1
+assert count_valid_password(read_input1(TEST_INPUT)) == 2
+assert count_valid_password(read_input2(TEST_INPUT)) == 1
 
         
 if __name__ == "__main__":
@@ -84,5 +87,5 @@ if __name__ == "__main__":
     # close the file
     file.close()
 
-    print(count_valid_password(Password1.read_input(input)))
-    print(count_valid_password(Password2.read_input(input)))
+    print(count_valid_password(read_input1(input)))
+    print(count_valid_password(read_input2(input)))
