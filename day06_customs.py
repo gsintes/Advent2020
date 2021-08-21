@@ -2,7 +2,6 @@
 Advent of code 2020 day 06
 https://adventofcode.com/2020/day/6
 """
-from os import truncate
 from typing import List
 
 TEST_INPUT = """abc
